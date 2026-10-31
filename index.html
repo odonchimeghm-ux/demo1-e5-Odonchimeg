@@ -247,18 +247,15 @@
         }
         .footer-logo-text {
             font-family: 'General Sans', -apple-system, sans-serif;
-            font-size: 21.9vw;
+            font-size: 21vw; /* запасной размер, точный подбирается в JS */
             font-weight: 400;
             color: #ffffff;
             letter-spacing: -0.03em;
-            margin-right: -0.03em;
-            transform: translateX(-20px);
             line-height: 0.8;
-            margin-top: 0;
-            margin-bottom: 0;
-            margin-left: 0;
+            margin: 0;
             text-align: center;
-            width: 100%;
+            display: inline-block;
+            max-width: 100%;
             pointer-events: none;
             opacity: 0.95;
             text-shadow: none;
@@ -456,6 +453,25 @@
                     wrapper.appendChild(inner);
                     logoText.appendChild(wrapper);
                 });
+
+                // Подгоняем размер шрифта так, чтобы слово точно помещалось по ширине экрана
+                const fitLogo = () => {
+                    const wrap = logoText.parentElement;
+                    const wrapStyle = getComputedStyle(wrap);
+                    const available = wrap.clientWidth
+                        - parseFloat(wrapStyle.paddingLeft)
+                        - parseFloat(wrapStyle.paddingRight);
+
+                    logoText.style.maxWidth = 'none';
+                    logoText.style.fontSize = '100px';
+                    const measured = logoText.getBoundingClientRect().width;
+                    logoText.style.fontSize = `${Math.floor(100 * available / measured * 100) / 100}px`;
+                    logoText.style.maxWidth = '';
+                };
+
+                fitLogo();
+                if (document.fonts) document.fonts.ready.then(fitLogo);
+                window.addEventListener('resize', fitLogo);
             }
 
             // Разделение верхнего заголовка на слова для анимации появления снизу вверх из маски с блюром
